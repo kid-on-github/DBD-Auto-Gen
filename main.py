@@ -20,14 +20,11 @@ cx = X / 2
 cy = Y / 2
 
 
-
 prevWhite = []
 white = []
 red = []
 nowRed = 0
 
-
-spaceCount = 0
 
 keyboard = Controller()
 def pressSpace():
@@ -35,18 +32,13 @@ def pressSpace():
     keyboard.press(Key.space)
     sleep(randrange(2500, 5000) * .00001)
     keyboard.release(Key.space)
-    print('space', spaceCount)
-    spaceCount += 1
     sleep(.5)
 
 
 while True:
     # capture the center of the screen
     orig = ImageGrab.grab(bbox=(cx-r, cy-r, cx+r, cy+r))
-    gs = ImageOps.grayscale(orig)
     loaded = orig.load()
-
-    def changeColor(x, y, color): gs.load()[x,y] = color
 
     # loop through pixels
     for i in range(r*2):
@@ -59,28 +51,20 @@ while True:
 
                 # white
                 if a > colorMin and b > colorMin and c > colorMin: 
-                    changeColor(i,j,255)
                     white.append((i,j))
                 
                 # red
                 elif a > colorMin and b < 20 and c < 20: 
-                    changeColor(i,j,100)
                     red.append((i,j))
-
-                else: changeColor(i,j,0)
-            else: changeColor(i,j,0)
-
 
     # check to see if the color has changed
     for i in red:
         if i in prevWhite:
             nowRed += 1
 
-
-    if nowRed > 1:
+    # if three pixels turns from white to red, press space
+    if nowRed > 3:
         pressSpace()
-        gs.show()
-        orig.show()
     
     nowRed = 0
     prevWhite = white
