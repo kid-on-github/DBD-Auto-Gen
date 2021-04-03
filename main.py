@@ -62,7 +62,7 @@ while True:
         if i in prevWhite:
             nowRed += 1
 
-    # if three pixels turns from white to red, press space
+    # if three white pixels turn red, press space
     if nowRed > 3:
         pressSpace()
     
