@@ -13,7 +13,7 @@ r = 70
 inner = r-10
 
 # color stuff and such
-colorMin = 170
+colorMin = 200
 
 # center
 cx = X / 2
@@ -24,7 +24,7 @@ cy = Y / 2
 prevWhite = []
 white = []
 red = []
-currRedCount = 0
+nowRed = 0
 
 
 spaceCount = 0
@@ -33,7 +33,6 @@ keyboard = Controller()
 def pressSpace():
     global spaceCount
     keyboard.press(Key.space)
-    # sleep(randrange(5500, 10000) * .00001)
     sleep(randrange(2500, 5000) * .00001)
     keyboard.release(Key.space)
     print('space', spaceCount)
@@ -43,11 +42,11 @@ def pressSpace():
 
 while True:
     # capture the center of the screen
-    s = ImageGrab.grab(bbox=(cx-r, cy-r, cx+r, cy+r))
-    sc = ImageOps.grayscale(s)
-    loaded = sc.load()
+    orig = ImageGrab.grab(bbox=(cx-r, cy-r, cx+r, cy+r))
+    gs = ImageOps.grayscale(orig)
+    loaded = orig.load()
 
-    def changeColor(x, y, color): loaded[x,y] = color
+    def changeColor(x, y, color): gs.load()[x,y] = color
 
     # loop through pixels
     for i in range(r*2):
@@ -56,13 +55,15 @@ while True:
             # dounut for checking colors
             if (sqrt((r-i)**2 + (r-j)**2) > inner) and (sqrt((r-i)**2 + (r-j)**2) < r):
 
+                a,b,c = loaded[i,j]
+
                 # white
-                if loaded[i,j] > colorMin: 
+                if a > colorMin and b > colorMin and c > colorMin: 
                     changeColor(i,j,255)
                     white.append((i,j))
                 
                 # red
-                elif loaded[i,j] > 58 and loaded[i,j] < 70: 
+                elif a > colorMin and b < 20 and c < 20: 
                     changeColor(i,j,100)
                     red.append((i,j))
 
@@ -73,14 +74,15 @@ while True:
     # check to see if the color has changed
     for i in red:
         if i in prevWhite:
-            currRedCount += 1
+            nowRed += 1
 
-    if currRedCount > 5:
+
+    if nowRed > 1:
         pressSpace()
-        s.show()
-        sc.show()
+        gs.show()
+        orig.show()
     
-    currRedCount = 0
+    nowRed = 0
     prevWhite = white
     red = []
     white = []
